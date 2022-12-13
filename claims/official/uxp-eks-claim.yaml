@@ -12,11 +12,23 @@ spec:
       cluster: eks
       provider: official
   parameters:
-    version: "1.23"
+    version: "1.24"
     fargateNamespace: default
     # nodeSize: small ### Supported values: small, medium, large
     # nodeCount: 3
     # region:  use1, eus, euc
     region: euw1
+    vpc: arn
+    subnets:
+      public:
+        cidrBlocks:
+          - 10.0.0.0/24
+          - 10.0.1.0/24
+          - 10.0.2.0/24
+      private:
+        cidrBlocks:
+          - 10.0.100.0/24
+          - 10.0.101.0/24
+          - 10.0.102.0/24
   writeConnectionSecretToRef:
     name: uxpeks

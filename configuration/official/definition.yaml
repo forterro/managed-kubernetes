@@ -42,6 +42,15 @@ metadata:
           validation:
           - required: true
             customError: Kubernetes version type is required.
+        - name: vpc
+          controlType: singleInput
+          type: string
+          path: ".spec.parameters.vpc"
+          title: VPC Arn
+          description: Arn of the vpc we will connect the cluster to.
+          validation:
+          - required: true
+            customError: VPC Id is required
         - name: region
           controlType: singleSelect
           path: ".spec.parameters.region"
@@ -99,7 +108,7 @@ spec:
   connectionSecretKeys:
   - kubeconfig
   defaultCompositionRef:
-    name: aks
+    name: eks
   group: compositions.io
   names:
     kind: XManagedCluster
@@ -143,8 +152,26 @@ spec:
                     description: The Namespace for Fargate Profile
                     type: string
                     default: default
+                  vpc:
+                    description: Arn of the VPC to connect to
+                    type: string
+                  subnets: 
+                    type: object
+                    properties:
+                      public:
+                        type: object
+                        properties:
+                          cidrBlocks: 
+                            description: Array of cidr for the three public subnets
+                            type: array
+                            items:
+                              type: string
+                            minItems: 3
+                            maxItems: 3
+                            uniqueItems: true
                 required:
                 - version
+                - vpc
             required:
             - id
             - parameters

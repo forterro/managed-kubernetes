@@ -553,23 +553,6 @@ spec:
         string:
           fmt: "%s-fargateprofile"
 
-  - name: ec2vpc
-    base:
-      apiVersion: ec2.aws.upbound.io/v1beta1
-      kind: VPC
-      spec:
-        forProvider:
-          cidrBlock: 10.0.0.0/16
-          tags:
-            Name: eks-cluster
-        providerConfigRef:
-          name: aws-uxp-provider
-    patches:
-    - type: PatchSet
-      patchSetName: region
-    - fromFieldPath: spec.id
-      toFieldPath: metadata.name
-
   - name: ec2sg-ng
     base:
       apiVersion: ec2.aws.upbound.io/v1beta1
@@ -578,8 +561,6 @@ spec:
         forProvider:
           description: Cluster communication with worker nodes
           name: ekscluster-sg
-          vpcIdSelector:
-            matchControllerRef: true
         providerConfigRef:
           name: aws-uxp-provider
     patches:
@@ -591,6 +572,9 @@ spec:
       - type: string
         string:
           fmt: "%s-sg"
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.vpc
+      toFieldPath: spec.forProvider.vpcId
 
   - name: ec2sg-rule
     base:
@@ -627,9 +611,6 @@ spec:
           access: public
       spec:
         forProvider:
-          cidrBlock: 10.0.0.0/24
-          vpcIdSelector:
-            matchControllerRef: true
           mapPublicIpOnLaunch: true
           tags:
             Name: eks-snet
@@ -647,6 +628,11 @@ spec:
       - type: string
         string:
           fmt: "%s-pub-a"
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.vpc
+      toFieldPath: spec.forProvider.vpcId
+    - fromFieldPath: spec.parameters.subnets.public.cidrBlocks[0]
+      toFieldPath: sprec.forProvider.cidrBlock
   - name: ec2snet-pub-b
     base:
       apiVersion: ec2.aws.upbound.io/v1beta1
@@ -656,9 +642,6 @@ spec:
           access: public
       spec:
         forProvider:
-          cidrBlock: 10.0.1.0/24
-          vpcIdSelector:
-            matchControllerRef: true
           mapPublicIpOnLaunch: true
           tags:
             Name: eks-snet
@@ -676,6 +659,11 @@ spec:
       - type: string
         string:
           fmt: "%s-pub-b"
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.vpc
+      toFieldPath: spec.forProvider.vpcId
+    - fromFieldPath: spec.parameters.subnets.public.cidrBlocks[1]
+      toFieldPath: sprec.forProvider.cidrBlock
   - name: ec2snet-pub-c
     base:
       apiVersion: ec2.aws.upbound.io/v1beta1
@@ -685,10 +673,6 @@ spec:
           access: public
       spec:
         forProvider:
-          cidrBlock: 10.0.2.0/24
-          vpcIdSelector:
-            matchControllerRef: true
-          mapPublicIpOnLaunch: true
           tags:
             Name: eks-snet
             kubernetes.io/role/elb: "1"
@@ -705,6 +689,11 @@ spec:
       - type: string
         string:
           fmt: "%s-pub-c"
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.vpc
+      toFieldPath: spec.forProvider.vpcId
+    - fromFieldPath: spec.parameters.subnets.public.cidrBlocks[2]
+      toFieldPath: sprec.forProvider.cidrBlock
 
   - name: ec2snet-prv-a
     base:
@@ -715,9 +704,6 @@ spec:
           access: private
       spec:
         forProvider:
-          cidrBlock: 10.0.100.0/24
-          vpcIdSelector:
-            matchControllerRef: true
           mapPublicIpOnLaunch: false
           tags:
             Name: eks-snet
@@ -734,6 +720,11 @@ spec:
       - type: string
         string:
           fmt: "%s-prv-a"
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.vpc
+      toFieldPath: spec.forProvider.vpcId
+    - fromFieldPath: spec.parameters.subnets.private.cidrBlocks[0]
+      toFieldPath: sprec.forProvider.cidrBlock
   - name: ec2snet-prv-b
     base:
       apiVersion: ec2.aws.upbound.io/v1beta1
@@ -743,9 +734,6 @@ spec:
           access: private
       spec:
         forProvider:
-          cidrBlock: 10.0.101.0/24
-          vpcIdSelector:
-            matchControllerRef: true
           mapPublicIpOnLaunch: false
           tags:
             Name: eks-snet
@@ -762,6 +750,11 @@ spec:
       - type: string
         string:
           fmt: "%s-prv-b"
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.vpc
+      toFieldPath: spec.forProvider.vpcId
+    - fromFieldPath: spec.parameters.subnets.private.cidrBlocks[1]
+      toFieldPath: sprec.forProvider.cidrBlock
   - name: ec2snet-prv-c
     base:
       apiVersion: ec2.aws.upbound.io/v1beta1
@@ -771,9 +764,6 @@ spec:
           access: private
       spec:
         forProvider:
-          cidrBlock: 10.0.102.0/24
-          vpcIdSelector:
-            matchControllerRef: true
           mapPublicIpOnLaunch: true
           tags:
             Name: eks-snet
@@ -790,6 +780,11 @@ spec:
       - type: string
         string:
           fmt: "%s-prv-c"
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.vpc
+      toFieldPath: spec.forProvider.vpcId
+    - fromFieldPath: spec.parameters.subnets.private.cidrBlocks[2]
+      toFieldPath: sprec.forProvider.cidrBlock
 
   - name: ec2-ig
     base:
@@ -813,8 +808,6 @@ spec:
       kind: RouteTable
       spec:
         forProvider:
-          vpcIdSelector:
-            matchControllerRef: true
         providerConfigRef:
           name: aws-uxp-provider
     patches:
@@ -826,6 +819,9 @@ spec:
       - type: string
         string:
           fmt: "%s-rt"
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.vpc
+      toFieldPath: spec.forProvider.vpcId
   - name: ec2-rt-route
     base:
       apiVersion: ec2.aws.upbound.io/v1beta1
