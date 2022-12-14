@@ -3,8 +3,6 @@ kind: ManagedCluster
 metadata:
   name: uxpeks
   namespace: managed
-  labels:
-    owner: natzka
 spec:
   id: uxpeks
   compositionSelector:
@@ -14,21 +12,20 @@ spec:
   parameters:
     version: "1.24"
     fargateNamespace: default
-    # nodeSize: small ### Supported values: small, medium, large
-    # nodeCount: 3
-    # region:  use1, eus, euc
+    nodeSize: small ### Supported values: small, medium, large
+    nodeCount: 3
     region: euw1
-    vpc: arn
+    vpc: vpc-062f98a3bd78338f5
     subnets:
       public:
         cidrBlocks:
-          - 10.0.0.0/24
-          - 10.0.1.0/24
-          - 10.0.2.0/24
+          - 10.163.15.0/27
+          - 10.163.15.32/27
+          - 10.163.15.64/27
       private:
         cidrBlocks:
-          - 10.0.100.0/24
-          - 10.0.101.0/24
-          - 10.0.102.0/24
+          - 10.163.15.128/27
+          - 10.163.15.160/27
+          - 10.163.15.192/27
   writeConnectionSecretToRef:
     name: uxpeks
